@@ -1,3 +1,5 @@
+# : in :.csv makes error 17kb to 0b?
+
 #Every Error handler needs .find_element() can fial
 #p137 release=driver.find_elment(*By.ID,"PressReleases")
 #.click()
