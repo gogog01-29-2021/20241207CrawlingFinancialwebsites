@@ -27,3 +27,17 @@ table
 
 
 save_to_csv([i.__dict__ for i in data],f"{current_time}.csv")   #Class release be dictionary
+save_to_csv([i.asdict() for i in data],f"{current_time}.csv")
+
+
+
+
+@dataclass
+class Release:
+    title: str
+    data: str
+    link: str                                             
+
+# release={"title":"","date":"","link":""}
+
+data: Release=[]
