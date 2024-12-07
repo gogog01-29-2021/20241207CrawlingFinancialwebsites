@@ -19,6 +19,8 @@ opacity:
 class="pages"
 
 
+
 table
 
     span=class
+#so last_button_with_number=buttons[-2].tag_name              <->
