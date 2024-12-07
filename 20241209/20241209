@@ -1,7 +1,6 @@
-Every 
-Error handler needs .find_element() can fial
-p137 release=driver.find_elment(*By.ID,"PressReleases")
-
+#Every Error handler needs .find_element() can fial
+#p137 release=driver.find_elment(*By.ID,"PressReleases")
+#.click()
 
 
 while crawling.
