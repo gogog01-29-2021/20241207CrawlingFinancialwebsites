@@ -18,6 +18,8 @@ start_element = soup.find(lambda tag: tag.name in ['h1', 'h2', 'div'] and sectio
 if end_end and
         if end_element and sibling == end_element:
 
+soup_element.get_text(strip=True)
+
 import html
 parser=html.parser.HTMLParser()
 
