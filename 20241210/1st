@@ -103,3 +103,161 @@ section_pairs = [
 extracted_sections = extract_sections(file_path, section_pairs)
 save_extracted_content(extracted_sections, output_folder)
 print(f"Content successfully extracted and saved to '{output_folder}'")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+==========================================================================================
+
+from bs4 import BeautifulSoup
+
+def extract_sections(file_path, section_pairs):
+    """
+    Extracts content between specified section headings from an HTML file.
+
+    Args:
+        file_path (str): Path to the HTML file.
+        section_pairs (list of tuples): List of (start_item, end_item) pairs.
+            If end_item is None, extract until the end of the file.
+
+    Returns:
+        dict: A dictionary containing extracted text, tables, and images.
+    """
+    with open(file_path, 'r', encoding='utf-8') as file:
+        soup = BeautifulSoup(file, 'html.parser')
+
+    all_extracted = {}
+
+    for i, (start_item, end_item) in enumerate(section_pairs):
+        # Locate the start element
+        start_element = soup.find(
+            lambda tag: tag.name in ['h1', 'h2', 'div'] and tag.get_text(strip=True).startswith(start_item)
+        )
+        if not start_element:
+            print(f"Warning: Start item '{start_item}' not found in the document.")
+            continue
+
+        # Locate the end element if provided
+        end_element = None
+        if end_item:
+            end_element = soup.find(
+                lambda tag: tag.name in ['h1', 'h2', 'div'] and tag.get_text(strip=True).startswith(end_item)
+            )
+
+        # Extract content between the headings
+        content = []
+        for sibling in start_element.find_next_siblings():
+            if sibling == end_element:
+                break
+            content.append(str(sibling))
+
+        # Parse content into categories
+        extracted = {
+            "text": [],
+            "tables": [],
+            "images": []
+        }
+        for element in content:
+            soup_element = BeautifulSoup(element, 'html.parser')
+            if soup_element.find('table'):
+                extracted["tables"].append(str(soup_element))
+            elif soup_element.find('img'):
+                extracted["images"].append(str(soup_element))
+            else:
+                extracted["text"].append(soup_element.get_text(strip=True))
+
+        # Store extracted content with key based on section pair
+        section_key = start_item.lower().replace(" ", "")
+        all_extracted[section_key] = extracted
+
+    return all_extracted
+
+def save_extracted_content(extracted_sections, output_folder):
+    """
+    Saves extracted content into a JSON-like structure.
+
+    Args:
+        extracted_sections (dict): Dictionary containing extracted content for each section.
+        output_folder (str): Folder path to save the extracted content.
+    """
+    import os
+    import json
+
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+
+    # Save extracted content as a JSON-like structure
+    output_file = os.path.join(output_folder, "extracted_content.json")
+    with open(output_file, "w", encoding="utf-8") as json_file:
+        formatted_content = {key: {"text": "\n".join(value["text"])} for key, value in extracted_sections.items()}
+        json.dump(formatted_content, json_file, indent=4, ensure_ascii=False)
+
+    # Print dictionary output to console
+    dictionary_output = {key: "\n".join(value["text"]) for key, value in extracted_sections.items()}
+    print(json.dumps(dictionary_output, indent=4, ensure_ascii=False))
+
+def get_sources_10k(company, fiscal_year):
+    """
+    Maps company and fiscal year to corresponding file path.
+
+    Args:
+        company (str): Company name (e.g., "TSLA", "GE").
+        fiscal_year (int): Fiscal year (e.g., 2022, 2023).
+
+    Returns:
+        str: File path for the specified company and fiscal year.
+    """
+    file_mapping = {
+        "TSLA": {
+            2022: "/content/tsla-20221231.html",
+            2023: "/content/tsla-20231231.html"
+        },
+        "GE": {
+            2022: "/content/generalelectric-20221231.html",
+            2023: "/content/generalelectric-20231231.html"
+        }
+    }
+    try:
+        return file_mapping[company][fiscal_year]
+    except KeyError:
+        raise ValueError(f"File for company '{company}' and fiscal year '{fiscal_year}' not found.")
+
+# Example usage:
+company = "TSLA"  # Replace with user input
+fiscal_year = 2023  # Replace with user input
+file_path = get_sources_10k(company, fiscal_year)  # Get file path dynamically
+output_folder = './extracted_content'  # Folder where extracted content will be saved
+
+# Define section pairs
+section_pairs = [
+    ('ITEM 1', 'ITEM 1A'),
+    ('ITEM 1A', 'ITEM 1B'),
+    ('ITEM 7', 'ITEM 7A')
+]
+
+# Extract content between specified section pairs
+extracted_sections = extract_sections(file_path, section_pairs)
+save_extracted_content(extracted_sections, output_folder)
+print(f"Content successfully extracted and saved to '{output_folder}'")
