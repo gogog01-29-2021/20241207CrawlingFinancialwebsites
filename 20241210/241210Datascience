@@ -7,6 +7,7 @@ Function for checking imagge is wrong or image is not exist
 
 correct start element
 end element
+"Between 1 and 1A there is no []"
 
 Is junk
  """  else:  # Process text content
