@@ -1,8 +1,8 @@
 Neither of them contains image
-iamge.jpg, is not exist
+iamge.jpg, is not exist        img src="img97702838_0.jpg"
 Overview ; <-text generate by OpenAI
 Financials <-table<-text
-Segment Performance<-
+Segment Performance<- from Financial table, generate barchart by matplotlib 
 Function for checking imagge is wrong or image is not exist
 
 Is junk
