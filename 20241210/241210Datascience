@@ -24,6 +24,8 @@ soup_element.get_text(strip=True)
 
 #It finds evbery item, not working
 start_element = soup.find(lambda tag: tag.name in ['h1', 'h2', 'div','span'] and start_item in tag.get_text(strip=True))
+#so change it to
+    start_element = soup.find(lambda tag: tag.name in ['h1', 'h2', 'div','span'] and tag.get_text(strip=True).startswith(start_item))
 
 
 import html
