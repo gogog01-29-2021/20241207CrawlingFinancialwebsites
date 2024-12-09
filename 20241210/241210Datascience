@@ -16,7 +16,8 @@ Is junk
                 markdown_content.append(f"### Text Content from {file_name}\n```\n{text_content}\n```")"""
 
 It is on span
-start_element = soup.find(lambda tag: tag.name in ['h1', 'h2', 'div'] and section in tag.get_text(strip=True))
+start_element = soup.findall(lambda tag: tag.name in ['h1', 'h2', 'div'.'span'] and section in tag.get_text(strip=True))                          start_element = soup.find_all(lambda tag: tag.name in ['h1', 'h2', 'div','span'] and tag.get_text(strip=True).startswith(start_item))[0]
+
 
 
 if end_end and
