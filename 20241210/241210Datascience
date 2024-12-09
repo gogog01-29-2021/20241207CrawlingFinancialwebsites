@@ -11,8 +11,15 @@ Is junk
                     text_content = f.read()
                 markdown_content.append(f"### Text Content from {file_name}\n```\n{text_content}\n```")"""
 
+It is on span
+start_element = soup.find(lambda tag: tag.name in ['h1', 'h2', 'div'] and section in tag.get_text(strip=True))
 
 
+if end_end and
+        if end_element and sibling == end_element:
+
+import html
+parser=html.parser.HTMLParser()
 
 
 
