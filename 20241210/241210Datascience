@@ -5,3 +5,107 @@ Is junk
                 with open(file_path, 'r', encoding='utf-8') as f:
                     text_content = f.read()
                 markdown_content.append(f"### Text Content from {file_name}\n```\n{text_content}\n```")"""
+
+
+
+
+
+
+
+
+
+
+import json
+from bs4 import BeautifulSoup
+
+def extract_section(file_path, start_item, end_item=None):
+    """
+    Extracts content between specified section headings from an HTML file.
+
+    Args:
+        file_path (str): Path to the HTML file.
+        start_item (str): Section to start extraction (e.g., "Item 1").
+        end_item (str): Section to end extraction (e.g., "Item 1A"). If None, extract until the end.
+
+    Returns:
+        dict: A dictionary containing extracted text, tables, and images.
+    """
+    with open(file_path, 'r', encoding='utf-8') as file:
+        soup = BeautifulSoup(file, 'html.parser')
+
+    # Locate the start element
+    start_element = soup.find(lambda tag: tag.name in ['h1', 'h2', 'div'] and start_item in tag.get_text(strip=True))
+    if not start_element:
+        raise ValueError(f"Start item '{start_item}' not found in the document.")
+
+    # Locate the end element if provided
+    end_element = None
+    if end_item:
+        end_element = soup.find(lambda tag: tag.name in ['h1', 'h2', 'div'] and end_item in tag.get_text(strip=True))
+
+    # Extract content between the headings
+    content = []
+    for sibling in start_element.find_next_siblings():
+        if end_element and sibling == end_element:
+            break
+        content.append(str(sibling))
+
+    # Parse content into categories
+    extracted = {
+        "text": [],
+        "tables": [],
+        "images": []
+    }
+    for element in content:
+        soup_element = BeautifulSoup(element, 'html.parser')
+        if soup_element.find('table'):
+            extracted["tables"].append(str(soup_element))
+        elif soup_element.find('img'):
+            extracted["images"].append(str(soup_element))
+        else:
+            extracted["text"].append(soup_element.get_text(strip=True))
+
+    return extracted
+
+def save_as_json(extracted_content, output_file):
+    """
+    Saves extracted content into a JSON file in the requested format.
+
+    Args:
+        extracted_content (dict): Dictionary containing extracted text, tables, and images.
+        output_file (str): File path to save the JSON output.
+    """
+    # Map text sections to corresponding keys in the JSON output
+    json_output = {
+        "item1": "",
+        "item1a": "",
+        "item7": "",
+        "income_statement": ""
+    }
+
+    # Populate JSON content from the extracted text
+    for text_section in extracted_content["text"]:
+        if "item 1" in text_section.lower():
+            json_output["item1"] = text_section
+        elif "item 1a" in text_section.lower():
+            json_output["item1a"] = text_section
+        elif "item 7" in text_section.lower():
+            json_output["item7"] = text_section
+        elif "income statement" in text_section.lower() or "consolidated income statement" in text_section.lower():
+            json_output["income_statement"] = text_section
+
+    # Save the JSON output
+    with open(output_file, 'w', encoding='utf-8') as json_file:
+        json.dump(json_output, json_file, indent=4, ensure_ascii=False)
+
+# Example usage:
+file_path = '/content/tsla-20231231.html'  # Replace with your file path
+output_file = './extracted_content/output.json'  # Output JSON file path
+
+try:
+    # Extract content between "Item 1" and "Item 1A"
+    section_content = extract_section(file_path, 'Item 1', 'Item 1A')
+    save_as_json(section_content, output_file)
+    print(f"Content successfully extracted and saved to '{output_file}'")
+except ValueError as e:
+    print(str(e))
