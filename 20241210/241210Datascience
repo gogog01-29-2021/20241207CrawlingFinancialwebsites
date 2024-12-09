@@ -1,0 +1,7 @@
+Function for checking imagge is wrong or image is not exist
+
+Is junk
+ """  else:  # Process text content
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    text_content = f.read()
+                markdown_content.append(f"### Text Content from {file_name}\n```\n{text_content}\n```")"""
