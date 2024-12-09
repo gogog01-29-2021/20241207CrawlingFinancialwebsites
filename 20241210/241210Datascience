@@ -5,6 +5,9 @@ Financials <-table<-text
 Segment Performance<- from Financial table, generate barchart by matplotlib 
 Function for checking imagge is wrong or image is not exist
 
+correct start element
+end element
+
 Is junk
  """  else:  # Process text content
                 with open(file_path, 'r', encoding='utf-8') as f:
