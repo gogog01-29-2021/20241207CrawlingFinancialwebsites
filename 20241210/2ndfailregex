@@ -1,0 +1,64 @@
+import re
+import matplotlib.pyplot as plt
+import base64
+from io import BytesIO
+
+def get_pie_chart(item7_content):
+    """
+    Generates a pie chart for operational segment performance and returns an HTML snippet containing the chart.
+
+    Args:
+        item7_content (str): Textual content of ITEM 7 from the 10-K report.
+
+    Returns:
+        str: HTML snippet with a Base64-encoded pie chart image.
+    """
+    # Parsing logic: Extract segment names and percentages using regular expressions
+    segments = {}
+    lines = item7_content.splitlines()
+    for line in lines:
+        match = re.match(r"([A-Za-z\s]+):\s*(\d+)%", line)
+        if match:
+            segment_name = match.group(1).strip()
+            segment_value = int(match.group(2))
+            segments[segment_name] = segment_value
+
+    if not segments:
+        raise ValueError("No valid segment data found in ITEM 7 content.")
+
+    # Generate pie chart
+    labels = list(segments.keys())
+    sizes = list(segments.values())
+    explode = [0.1 if i == max(sizes) else 0 for i in sizes]  # Highlight the largest segment
+
+    plt.figure(figsize=(6, 6))
+    plt.pie(sizes, explode=explode, labels=labels, autopct='%1.1f%%', startangle=140)
+    plt.title("Operational Segment Performance")
+
+    # Save chart to a Base64 string
+    buf = BytesIO()
+    plt.savefig(buf, format="png", bbox_inches="tight")
+    buf.seek(0)
+    img_base64 = base64.b64encode(buf.read()).decode('utf-8')
+    buf.close()
+    plt.close()
+
+    # Return HTML snippet
+    html_snippet = f'<html><body><img src="data:image/png;base64,{img_base64}" alt="Pie Chart"></body></html>'
+    return html_snippet
+
+# Example usage
+item7_text = """
+Automotive: 40%
+Energy Generation: 25%
+Services: 20%
+Others: 15%
+"""
+pie_chart_html = get_pie_chart(item7_text)
+
+# Save or display the HTML snippet
+output_file = "./pie_chart.html"
+with open(output_file, "w", encoding="utf-8") as file:
+    file.write(pie_chart_html)
+
+print(f"Pie chart HTML snippet saved to {output_file}")
