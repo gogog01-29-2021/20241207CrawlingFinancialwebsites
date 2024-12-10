@@ -1,0 +1,41 @@
+from bs4 import BeautifulSoup
+
+def get_sources_10k(file_path):
+    """
+    Extract Item1, Item1a, Item7, and the income statement from the 10-K document.
+
+    Args:
+        file_path (str): Path to the HTML file.
+
+    Returns:
+        dict: Dictionary containing extracted sections.
+    """
+    # Load and parse the HTML file
+    with open(file_path, 'r', encoding='utf-8') as file:
+        soup = BeautifulSoup(file, 'lxml')
+
+    # Define search keys and outputs
+    sections = {
+        "item1": "Item 1",
+        "item1a": "Item 1A",
+        "item7": "Item 7",
+        "income_statement": "Consolidated Income Statement"
+    }
+    extracted_data = {}
+
+    # Extract each section based on keywords
+    for key, section_name in sections.items():
+        content = []
+        for tag in soup.find_all(text=lambda text: text and section_name.lower() in text.lower()):
+            parent = tag.find_parent()  # Find the parent node to capture more context
+            if parent:
+                content.append(parent.get_text(separator=" ", strip=True))
+
+        extracted_data[key] = "\n".join(content) if content else "Section not found."
+
+    return extracted_data
+
+# Test the function with Tesla's FY23 document
+tesla_fy23_path = "./tsla-20231231.html"
+extracted_sections = get_sources_10k(tesla_fy23_path)
+extracted_sections
