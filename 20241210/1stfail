@@ -39,3 +39,39 @@ def get_sources_10k(file_path):
 tesla_fy23_path = "./tsla-20231231.html"
 extracted_sections = get_sources_10k(tesla_fy23_path)
 extracted_sections
+
+===================================================================================================================
+from bs4 import BeautifulSoup
+
+def extract_section(html_content, item):
+    soup = BeautifulSoup(html_content, 'html.parser')
+
+    # Find the header for the desired item (e.g., "ITEM 1")
+    target_header = soup.find(string=lambda text: text and item.lower() in text.lower())
+    if not target_header:
+        return f"Section '{item}' not found."
+
+    # Traverse siblings and collect content until the next "ITEM" header
+    extracted_text = []
+    current_tag = target_header.find_parent()
+    while current_tag:
+        current_tag = current_tag.find_next()
+        if current_tag and current_tag.name and current_tag.name in ['h1', 'h2', 'span']:
+            if 'ITEM' in current_tag.get_text(strip=True).upper():
+                break
+        if current_tag:
+            extracted_text.append(current_tag.get_text(strip=True))
+
+    return ' '.join(extracted_text).strip()
+
+# Example usage
+html_file_path = '/content/tsla-20231231.html'  # Replace with your actual file path
+
+with open(html_file_path, 'r', encoding='utf-8') as file:
+    html_content = file.read()
+
+item_to_extract = 'ITEM 1'  # Replace with the desired section (e.g., 'ITEM 2')
+extracted_section = extract_section(html_content, item_to_extract)
+
+print(f"Extracted content for {item_to_extract}:\n{extracted_section}")
+
