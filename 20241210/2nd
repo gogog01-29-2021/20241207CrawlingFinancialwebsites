@@ -1,0 +1,51 @@
+import re
+import json
+
+# Load the input text from the JSON file
+file_path = "/content/extracted_content/extracted_content.json"
+
+# Function to extract data
+def extract_data_from_text(text):
+    data = {}
+    # Regex patterns for each category
+    patterns = {
+        "Automotive Revenue": r"total revenues of \$(\d+\.\d+)",
+        "Services and Other": r"Services and other revenue.*?now totals \$(\d+\.\d+)",
+        "Energy Generation and Storage": r"Energy generation and storage revenue.*?now totals \$(\d+\.\d+)",
+        "Automotive Leasing": r"Automotive leasing revenue.*?now totals \$(\d+\.\d+)",
+        "Automotive Regulatory Credits": r"Automotive regulatory credits revenue.*?now totals \$(\d+\.\d+)"
+    }
+
+    # Extract values using patterns
+    for key, pattern in patterns.items():
+        match = re.search(pattern, text)
+        if match:
+            data[key] = float(match.group(1))  # Convert to float for numerical processing
+
+    return data
+
+def main():
+    # Load the JSON data
+    with open(file_path, 'r') as file:
+        json_data = json.load(file)
+
+    # Extract text from item7
+    text_data = json_data.get("item7", {}).get("text", "")
+
+
+
+
+
+
+#Error
+# Process the text and extract data
+    extracted_data = extract_data_from_text(text_data)
+
+    # Print the structured output
+    print("data = {")
+    for key, value in extracted_data.items():
+        print(f'    "{key}": {value},  # billion USD')
+    print("}")
+
+if __name__ == "__main__":
+    main()
