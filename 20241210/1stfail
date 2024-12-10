@@ -75,3 +75,46 @@ extracted_section = extract_section(html_content, item_to_extract)
 
 print(f"Extracted content for {item_to_extract}:\n{extracted_section}")
 
+
+
+
+============================================================================================================================================================================
+
+from bs4 import BeautifulSoup
+
+def extract_section(html_content, start_item, stop_item):
+    soup = BeautifulSoup(html_content, 'html.parser')
+
+    # Find the start of the target item
+    start_header = soup.find('span', text=lambda x: x and start_item.lower() in x.lower())
+    if not start_header:
+        return f"Section '{start_item}' not found."
+
+    # Extract text until the stop item
+    extracted_text = []
+    current_tag = start_header.find_parent()
+    while current_tag:
+        current_tag = current_tag.find_next()
+        if current_tag and current_tag.name in ['div', 'span', 'p']:
+            if stop_item.lower() in current_tag.get_text(strip=True).lower():
+                break  # Stop when the stop_item is encountered
+            extracted_text.append(current_tag.get_text(strip=True))
+
+    return ' '.join(extracted_text).strip()
+
+# Example usage
+html_file_path = '/content/tsla-20231231.html'  # Replace with your actual file path
+
+with open(html_file_path, 'r', encoding='utf-8') as file:
+    html_content = file.read()
+
+# Specify the start and stop sections
+start_item = 'ITEM 1. BUSINESS'
+stop_item = 'ITEM 1A. RISK FACTORS'
+
+# Extract the desired section
+extracted_section = extract_section(html_content, start_item, stop_item)
+
+print(f"Extracted content for {start_item}:\n{extracted_section}")
+
+
