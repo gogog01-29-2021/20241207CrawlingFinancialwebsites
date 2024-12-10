@@ -1,0 +1,57 @@
+import matplotlib.pyplot as plt
+import base64
+from io import BytesIO
+
+def get_pie_chart(item7_content):
+    """
+    Generates a pie chart for operational segment performance and returns an HTML snippet containing the chart.
+
+    Args:
+        item7_content (str): Textual content of ITEM 7 from the 10-K report.
+
+    Returns:
+        str: HTML snippet with a Base64-encoded pie chart image.
+    """
+    # Example parsing logic (you need to adjust it based on the actual content of ITEM 7):
+    segments = {
+    "Automotive Revenue": 96.77,  # billion USD
+    "Services and Other": 8.90,  # billion USD
+    "Energy Generation and Storage": 14.72,  # billion USD
+    "Automotive Leasing": 2.2,  # billion USD
+    "Automotive Regulatory Credits": 1.8  # billion USD
+}
+
+    # Generate pie chart
+    labels = list(segments.keys())
+    sizes = list(segments.values())
+    explode = [0.1 if i == max(sizes) else 0 for i in sizes]  # Highlight the largest segment
+
+    plt.figure(figsize=(6, 6))
+    plt.pie(sizes, explode=explode, labels=labels, autopct='%1.1f%%', startangle=140)
+    plt.title("Operational Segment Performance")
+
+    # Save chart to a Base64 string
+    buf = BytesIO()
+    plt.savefig(buf, format="png", bbox_inches="tight")
+    buf.seek(0)
+    img_base64 = base64.b64encode(buf.read()).decode('utf-8')
+    buf.close()
+    plt.close()
+
+    # Return HTML snippet
+    html_snippet = f'<html><body><img src="data:image/png;base64,{img_base64}" alt="Pie Chart"></body></html>'
+    return html_snippet
+
+# Example usage
+item7_text = """
+This is a placeholder for ITEM 7 content. Replace this with actual extracted content.
+Automotive: 40%, Energy Generation: 25%, Services: 20%, Others: 15%
+"""
+pie_chart_html = get_pie_chart(item7_text)
+
+# Save or display the HTML snippet
+output_file = "./pie_chart.html"
+with open(output_file, "w", encoding="utf-8") as file:
+    file.write(pie_chart_html)
+
+print(f"Pie chart HTML snippet saved to {output_file}")
